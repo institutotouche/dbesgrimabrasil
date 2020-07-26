@@ -1,6 +1,6 @@
 # Especificas do projeto
 credentials/cloud_sql_proxy.exe
-
+credentials/proxy_credentials.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
