@@ -1,7 +1,10 @@
 # Especificas do projeto
-credentials/cloud_sql_proxy.exe
-credentials/proxy_credentials.json
-credentials/connect_credentials.json
+credentials/*
+!credentials/README.md
+db-upload/upload-pending/*
+!db-upload/upload-pending/README.md
+db-upload/upload-completed/*
+!db-upload/upload-completed/README.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
