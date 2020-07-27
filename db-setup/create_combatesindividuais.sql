@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS CombatesIndividuais (					-- Cada registro um combate
 	PontosAtleta1 INT,		-- Pontuacao atleta 1 ao final desse combate
 	PontosAtleta2 INT,		-- Pontuacao atleta 2 ao final desse combate
 	IndexArbitro BIGINT,	-- Referencia ao arbitro do combate
-	IndexStatus BIGINT,		-- Referencia ao status final do combate
+	IndexStatus BIGINT DEFAULT 0,		-- Referencia ao status final do combate (por padrao, assume combate finalizado)
 	IndexFonte BIGINT,									-- Indice de referencia da ultima fonte de informacao
 	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Momento da ultima atualizacao
 )
