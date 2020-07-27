@@ -1,0 +1,9 @@
+# Conda environment configuration file
+
+name: dbesgrima
+dependencies:
+  - python=3.8.*
+  - ipykernel
+  - pandas=1.0.5
+  - pymysql=0.9.*
+  - tqdm=4.*
