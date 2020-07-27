@@ -13,7 +13,7 @@ Note que o arquivo `proxy_credentials.json` é um **template**, modifique localm
 O proxy precisa estar ativo. Execute:
 > $ ./cloud_sql_proxy.exe -instances=memoriadaesgrimabrasileira:us-central1:memoriadaesgrimabrasileira=tcp:3306 -credential_file=./proxy_credentials.json
 >
-> (A porta TCP pode ser qualquer porta livre no computador local. Porém caso use uma porta diferente de 3306, lembre-se de atualizar também nos arquivos de configuração dos scripts Python para conectar corretamente)
+> (A porta TCP pode ser qualquer porta livre no computador local. Porém caso use uma porta diferente de 3306, lembre-se de atualizar também no arquivo `connect_credentials.json` para que os scripts Python conectem corretamente)
 
 #### Para conectar com um cliente SQL
 
@@ -26,5 +26,7 @@ Utilize nome de usuário e senha apropriados.
 Não é necessário configurar *proxy* no cliente - o aplicativo do Google já resolve isso e basta conectar na porta local especificada. Também não é necessário utilizar `SSH` ou `SSL`.
 
 #### Para conectar via Python
+
+Atualize o arquivo `connect_credentials.json` com login e password.
 
 Os scripts já estão devidamente configurados, divirta-se.
