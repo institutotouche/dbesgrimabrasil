@@ -20,14 +20,15 @@ if proxy_subprocess and not proxy_subprocess.poll():
     print('Subprocess ID: ', proxy_subprocess.pid, '\n\n')
 
 # Instantiate connection
-# connection = pymysql.connect(host=credentials.get('host','localhost'),
-#                              port=credentials.get('port',3306),
-#                              user=credentials.get('user','user'),
-#                              password=credentials.get('password','password'),
-#                              db=credentials.get('db','db'))
+connection = pymysql.connect(host=credentials.get('host','localhost'),
+                             port=credentials.get('port',3306),
+                             user=credentials.get('user','user'),
+                             password=credentials.get('password','password'),
+                             db=credentials.get('db','db'))
+
+# Read data from CSVs
 
 # Find rows already in db
-
 
 # Split new data into inserts and updates
 
@@ -37,9 +38,9 @@ if proxy_subprocess and not proxy_subprocess.poll():
 # Insert completely new rows
 
 
-# commit
+# Finalize connection
 # connection.commit()
-# connection.close()
+connection.close()
 
 # close proxy
 while not proxy_subprocess.poll():
