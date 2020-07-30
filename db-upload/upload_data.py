@@ -21,13 +21,6 @@ connection = pymysql.connect(host=credentials.get('host','localhost'),
                              password=credentials.get('password','password'),
                              db=credentials.get('db','db'))
 
-# Just testing
-cursor = connection.cursor()
-query = 'SELECT * FROM StatusCombates'
-cursor.execute(query)
-data = cursor.fetchall()
-print('\n\n',data,'\n\n')
-
 # Read data from CSVs
 stage = DataStage()
 if stage.sorted_file_list:
@@ -39,7 +32,9 @@ else:
     print('\nNenhum arquivo encontrado para upload\n')
 
 # Finalize connection
-connection.close()
+while connection.open:
+    connection.close()
+print('Conexão com o banco de dados finalizada.')
 
 # close proxy
 proxy.close()
