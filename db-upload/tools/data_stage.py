@@ -4,9 +4,18 @@ import os
 class DataStage(object):
     def __init__(self, pending_dir='upload-pending'):
         # get file_list
+        file_list = os.path.listdir(os.path.join('.',pending_dir))
+        # get only csvs
+        for f in file_list:
+            if f[-4:] != '.csv':
+                file_list.remove(f)
+        # load priority list
+        with open(os.path.join('.','fixtures','table_priority_order.txt'), "r") as priority_file:
+            priority_list = json.load(priority_file)
+        priority_list = [f.lower() for f in priority_list] # ensure everything is lower case
+        
         # sort files according to priority
-        self.sorted_file_list = [1,2]
-        return None
+        self.sorted_file_list = file_list
 
     def process_file(self, db_connection, file_path):
         # read data
