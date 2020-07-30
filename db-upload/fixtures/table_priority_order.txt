@@ -15,5 +15,6 @@
 "CombatesIndividuais",
 "CombatesEquipes",
 "Resultados",
-"Ranking"
+"Ranking",
+"teste"
 ]

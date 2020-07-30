@@ -8,13 +8,13 @@ class DataStage(object):
         self.sorted_csv_list = self._prioritize(csv_list)
 
     def process_file(self, db_connection, file_name):
-        raw_data = self._read_data(os.path.join(self.pending_path, file_name))
+        raw_data_list = self._read_data(os.path.join(self.pending_path, file_name))
         # clean headers
+        clean_list = self._clean_headers(raw_data_list)
 
         # test
         print('\n****************')
-        print(raw_data)
-
+        print(clean_list)
         print('\n****************')
         # split inserts vs updates (updates go first)
         # fill cross-references
@@ -44,8 +44,10 @@ class DataStage(object):
     def _read_data(self, file_path):
         with open(file_path, newline='', encoding='utf-8') as f:
             reader = csv.reader(f)
-            data = [tuple(row) for row in reader]
-        return data
+            data_list = [tuple(row) for row in reader]
+        return data_list
 
-    def _clean_headers(self):
-        return None
+    def _clean_headers(self, data_list):
+        drop_list = ['index', 'datatype', 'data size'] # TODO this should be a fixture
+        clean_list = [ row for row in data_list if row[0].lower() not in drop_list ]
+        return clean_list
