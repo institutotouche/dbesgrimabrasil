@@ -28,6 +28,7 @@ if stage.sorted_file_list:
         query, args = stage.process_file(connection, file)
         # cursor.executemany(query, args)
         # connection.commit()
+        # move file out if commit was ok
 else:
     print('\nNenhum arquivo encontrado para upload\n')
 
