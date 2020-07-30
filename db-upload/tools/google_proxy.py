@@ -18,8 +18,8 @@ class GoogleProxy(object):
         time.sleep(5)
 
         if self.proxy_subprocess and not self.proxy_subprocess.poll():
-            print('\n\nProxy do Google aberto na porta', self.port)
-            print('Subprocess ID: ', self.proxy_subprocess.pid, '\n\n')
+            print('\nProxy do Google aberto na porta', self.port)
+            print('Subprocess ID: ', self.proxy_subprocess.pid, '\n')
 
 
     def close(self):
