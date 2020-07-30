@@ -1,7 +1,8 @@
 import json
-import os, subprocess
+import os
 import pymysql
 
+from tools.google_proxy import GoogleProxy
 
 # Load credentials
 credentials_path = os.path.join('..','credentials','connect_credentials.json')
@@ -9,15 +10,10 @@ with open(credentials_path) as f:
     credentials = json.load(f)
 
 # Start proxy
-proxy_path = os.path.join('..','credentials','cloud_sql_proxy.exe')
-instances_string = '-instances=memoriadaesgrimabrasileira:us-central1:memoriadaesgrimabrasileira=tcp:' + \
-                    str(credentials.get('port',3306))
-proxy_credentials_string = '-credential_file=' + os.path.join('..','credentials','proxy_credentials.json')
-proxy_subprocess = subprocess.Popen([proxy_path, instances_string, proxy_credentials_string])
+proxy = GoogleProxy(credentials)
+proxy.open()
 
-if proxy_subprocess and not proxy_subprocess.poll():
-    print('\n\nProxy do Google aberto na porta', credentials.get('port',3306))
-    print('Subprocess ID: ', proxy_subprocess.pid, '\n\n')
+
 
 # Instantiate connection
 connection = pymysql.connect(host=credentials.get('host','localhost'),
@@ -25,6 +21,14 @@ connection = pymysql.connect(host=credentials.get('host','localhost'),
                              user=credentials.get('user','user'),
                              password=credentials.get('password','password'),
                              db=credentials.get('db','db'))
+
+# Just testing
+cursor = connection.cursor()
+query = 'SELECT * FROM StatusCombates'
+cursor.execute(query)
+data = cursor.fetchall()
+print(data)
+
 
 # Read data from CSVs
 
@@ -43,8 +47,6 @@ connection = pymysql.connect(host=credentials.get('host','localhost'),
 connection.close()
 
 # close proxy
-while not proxy_subprocess.poll():
-    proxy_subprocess.terminate()
-print('\nProxy do Google terminado.')
+proxy.close()
 
-print('\n\n\n\n')
+print('\n\n***** Script terminado sem erros *****\n\n')
