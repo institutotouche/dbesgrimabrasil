@@ -23,8 +23,8 @@ connection = pymysql.connect(host=credentials.get('host','localhost'),
 
 # Read data from CSVs
 stage = DataStage()
-if stage.sorted_file_list:
-    for file in stage.sorted_file_list:
+if stage.sorted_csv_list:
+    for file in stage.sorted_csv_list:
         query, args = stage.process_file(connection, file)
         # cursor.executemany(query, args)
         # connection.commit()
