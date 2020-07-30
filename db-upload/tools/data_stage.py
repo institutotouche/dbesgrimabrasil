@@ -7,9 +7,15 @@ class DataStage(object):
         csv_list = self._get_CSV_list()
         self.sorted_csv_list = self._prioritize(csv_list)
 
-    def process_file(self, db_connection, file_path):
-        # read data
+    def process_file(self, db_connection, file_name):
+        raw_data = self._read_data(os.path.join(self.pending_path, file_name))
         # clean headers
+
+        # test
+        print('\n****************')
+        print(raw_data)
+
+        print('\n****************')
         # split inserts vs updates (updates go first)
         # fill cross-references
             # for both inserts and updates
@@ -34,6 +40,12 @@ class DataStage(object):
         with open(os.path.join('.','fixtures','table_priority_order.txt'), "r") as priority_file:
             priority_list = json.load(priority_file)
         return [f.lower()+'.csv' for f in priority_list] # return everything in lower case
+
+    def _read_data(self, file_path):
+        with open(file_path, newline='', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            data = [tuple(row) for row in reader]
+        return data
 
     def _clean_headers(self):
         return None
