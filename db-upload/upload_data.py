@@ -26,7 +26,6 @@ stage = DataStage()
 if stage.sorted_csv_list:
     for file in stage.sorted_csv_list:
         query, args = stage.process_file(connection, file)
-        # cursor.executemany(query, args)
         # connection.commit()
         # move file out if commit was ok
 else:
