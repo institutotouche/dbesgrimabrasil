@@ -15,7 +15,7 @@ class GoogleProxy(object):
         self.proxy_subprocess = subprocess.Popen([self.proxy_path, self.instances_string, self.proxy_credentials_string])
 
         # TODO replace this with a proper check for whether the proxy has been opened correctly
-        time.sleep(5)
+        time.sleep(2)
 
         if self.proxy_subprocess and not self.proxy_subprocess.poll():
             print('\nProxy do Google aberto na porta', self.port)
