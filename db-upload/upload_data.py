@@ -25,9 +25,9 @@ connection = pymysql.connect(host=credentials.get('host','localhost'),
 stage = DataStage(connection)
 if stage.sorted_csv_list:
     for file in stage.sorted_csv_list:
-        query, args = stage.process_file(file)
-        connection.commit()
+        stage.process_file(file)
         stage.archive_file(file)
+    connection.commit()
 else:
     print('\nNenhum arquivo encontrado para upload\n')
 

@@ -17,9 +17,6 @@ class DataStage(object):
         update_values, insert_values = self.query_manager.make_updates(fields, datatypes, values, table_name)
         self.query_manager.make_inserts(fields, insert_values, table_name)
 
-        # TODO think about meaningful return
-        return 0, 0 # returns list of (query, args) tuples
-
     def _get_CSV_list(self):
         # Renames CSV files to adequate case and return list with new names
         table_names = self._load_priority_list()
