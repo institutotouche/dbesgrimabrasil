@@ -9,7 +9,8 @@ class DataStage(object):
         self.sorted_csv_list = self._prioritize(csv_list)
         # TODO move base queries to a json fixture
         self.base_queries={
-            'select_all': 'SELECT * FROM :%(table)s',
+            # 'select_all': 'SELECT * FROM %(table)s',
+            'select_all': 'SELECT * FROM Entidades WHERE LOWER(Nome) LIKE \'%s\' ',
             'insert': '',
             'update': ''
         }
@@ -17,11 +18,11 @@ class DataStage(object):
     def process_file(self, file_name):
         table_name = file_name[:-4]
         raw_data_list = self._read_data(os.path.join(self.pending_path, file_name))
-        fields, values = self._clean_headers(raw_data_list)
+        fields, datatypes, values = self._clean_headers(raw_data_list)
 
-        update_values, insert_values = self._make_updates(fields, values, table_name)
+        update_values, insert_values = self._make_updates(fields, datatypes, values, table_name)
         # TODO make inserts
-        # self.db_connection.execute(insert_query, [fields, insert_values])
+        # cursor.execute(insert_query, [fields, insert_values])
 
         # TODO think about meaningful return
         return 0, 0 # returns list of (query, args) tuples
@@ -54,18 +55,19 @@ class DataStage(object):
         return data_list
 
     def _clean_headers(self, data_list):
-        fields = [row for row in data_list if row[0].lower()=='index']
+        fields = list([row for row in data_list if row[0].lower()=='index'][0])
+        datatypes = list([row for row in data_list if row[0].lower()=='datatype'][0])
         drop_list = ['index', 'datatype', 'data size'] # TODO this should be a fixture
         clean_list = [ row for row in data_list if row[0].lower() not in drop_list ]
-        return fields, clean_list
+        return fields, datatypes, clean_list
 
-    def _make_updates(self, fields, values, table_name):
+    def _make_updates(self, fields, datatypes, values, table_name):
         update_values = []
         insert_values = []
 
         for row in values:
-            if self._row_exists(fields, row, table_name):
-                # self.db_connection.execute(query, args)
+            if self._row_exists(fields, datatypes, row, table_name):
+                # cursor.execute(query, args)
                 update_values.append(row)
             else:
                 insert_values.append(row)
@@ -73,9 +75,36 @@ class DataStage(object):
 
         return update_values, insert_values
 
-    def _row_exists(self, fields, row, table_name):
+    def _row_exists(self, fields, datatypes, row, table_name):
         # TODO complete function
 
-        # Iterate over values looking for match
-        # rules are different for each table... so a new fixture?
+        base_query = 'SELECT * FROM Entidades WHERE'
+        with self.db_connection.cursor() as cursor:
+            query = base_query
+            for field, datatype, value in zip(fields, datatypes, row):
+                if field.lower() == 'index':
+                    continue
+                elif value:
+                    new_clause = self._add_field_to_where_clause(field, value, datatype)
+                    query = ' '.join([query, new_clause])
+            if query[-3:] == ' OR':
+                query = query[:-3]
+            cursor.execute(query)
+            results = cursor.fetchall()
+        # TODO assess results (is it enough that one value was found?)
+        # TODO rules may be different for each table... so a new fixture?
         return False
+
+    def _add_field_to_where_clause(self, field, value, datatype):
+        # TODO move datatype variants into fixture
+        text_types = ['Text', 'Varchar', 'Char']
+        date_types = ['Date', 'Datetime']
+        if datatype in date_types:
+            # dates may frequently coincide between different entries so shouldn't be compared
+            # TODO unless maybe in combination with other fields?
+            return ''
+        if datatype in text_types:
+            where_clause = ''.join(['LOWER(', field, ') LIKE \'%', str(value).lower(), '%\' OR'])
+        else:
+            where_clause = ''.join([field, '=', value, ' OR'])
+        return where_clause
