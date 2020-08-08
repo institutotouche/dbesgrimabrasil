@@ -2,8 +2,9 @@ import csv, json
 import os
 
 class DataStage(object):
-    def __init__(self, db_connection, pending_dir='upload-pending'):
+    def __init__(self, db_connection, pending_dir='upload-pending', archive_dir='upload-completed'):
         self.pending_path = os.path.join('.',pending_dir)
+        self.complete_path = os.path.join('.',archive_dir)
         csv_list = self._get_CSV_list()
         self.sorted_csv_list = self._prioritize(csv_list)
         self.query_manager = QueryManager(db_connection)
@@ -53,6 +54,13 @@ class DataStage(object):
         clean_list = [ row for row in data_list if row[0].lower() not in drop_list ]
         return fields, datatypes, clean_list
 
+    def archive_file(self, filename):
+        if not os.path.exists(self.complete_path):
+            os.mkdir(self.complete_path)
+        os.rename(os.path.join(self.pending_path,filename),
+                os.path.join(self.complete_path,filename)
+                )
+
 
 class QueryManager(object):
 
@@ -66,6 +74,7 @@ class QueryManager(object):
 
         for row in values:
             if self._row_exists(fields, datatypes, row, table_name):
+                # TODO maybe "_row_exists" should return only fields to add?
                 # cursor.execute(query, args)
                 update_values.append(row)
             else:

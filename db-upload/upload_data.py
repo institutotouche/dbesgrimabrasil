@@ -26,8 +26,8 @@ stage = DataStage(connection)
 if stage.sorted_csv_list:
     for file in stage.sorted_csv_list:
         query, args = stage.process_file(file)
-        # connection.commit()
-        # move file out if commit was ok
+        connection.commit()
+        stage.archive_file(file)
 else:
     print('\nNenhum arquivo encontrado para upload\n')
 
