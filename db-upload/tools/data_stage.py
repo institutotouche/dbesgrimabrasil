@@ -144,18 +144,15 @@ class QueryManager(object):
                 clean_values.remove(value)
 
         fields_string = ','.join(clean_fields)
-        insert_query = ''.join([base_query,' (',fields_string, ') '])
+        insert_query = ''.join([base_query, ' (', fields_string, ') VALUES ('])
 
-        values_string = 'VALUES ('
         for value, datatype in zip(clean_values, datatypes):
             # TODO what about date types?
             if datatype in text_types:
                 sep = '\''
             else:
                 sep = ''
-            values_string = ''.join([values_string, sep, value, sep, ','])
-        values_string = values_string[:-1] + ')'
-        insert_query = ''.join([insert_query, values_string, ','])
-        insert_query = insert_query[:-1] + ';'
+            insert_query = ''.join([insert_query, sep, value, sep, ','])
+        insert_query = insert_query[:-1] + ');'
 
         return insert_query
