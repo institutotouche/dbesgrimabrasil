@@ -66,7 +66,6 @@ class QueryManager(object):
 
     def __init__(self, db_connection):
         self.db_connection = db_connection
-        # TODO read base queries from fixture (?)
 
     def make_updates(self, fields, datatypes, values, table_name):
         update_values = []
