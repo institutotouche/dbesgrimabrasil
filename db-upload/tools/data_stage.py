@@ -22,10 +22,12 @@ class DataStage(object):
 
     def _get_CSV_list(self):
         # Renames CSV files to adequate case and return list with new names
+        table_names = self._load_priority_list()
         for file in os.listdir(self.pending_path):
-            if file[-4:]=='.csv':
+            if file[-4:].lower()=='.csv':
+                new_name = [tn for tn in table_names if tn.lower()==file.lower() ][0]
                 os.rename(os.path.join(self.pending_path,file),
-                        os.path.join(self.pending_path,file.lower()) )
+                        os.path.join(self.pending_path,new_name) )
         return [file for file in os.listdir(self.pending_path)
                 if file[-4:]=='.csv']
 
@@ -38,7 +40,7 @@ class DataStage(object):
         # Loads the list of tables in priority order
         with open(os.path.join('.','fixtures','table_priority_order.txt'), "r") as priority_file:
             priority_list = json.load(priority_file)
-        return [f.lower()+'.csv' for f in priority_list] # return everything in lower case
+        return [f+'.csv' for f in priority_list]
 
     def _read_data(self, file_path):
         # Reads data from a file, without any processing
