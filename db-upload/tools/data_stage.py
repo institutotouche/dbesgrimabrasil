@@ -15,7 +15,7 @@ class DataStage(object):
         fields, datatypes, values = self._clean_headers(raw_data_list)
 
         update_values, insert_values = self.query_manager.make_updates(fields, datatypes, values, table_name)
-        self.query_manager.make_inserts(fields, insert_values, table_name)
+        self.query_manager.make_inserts(fields, datatypes, insert_values, table_name)
 
     def _get_CSV_list(self):
         # Renames CSV files to adequate case and return list with new names
@@ -83,17 +83,20 @@ class QueryManager(object):
 
         return update_values, insert_values
 
-    def make_inserts(self, fields, values, table_name):
+    def make_inserts(self, fields, datatypes, values, table_name):
         # TODO write query and function
 
         if fields[0].lower()=='index':
             fields.pop(0)
+            datatypes.pop(0)
             values = [row[1:] for row in values]
 
-        base_query = ' '.join(['INSERT INTO', table_name, '( )'])
-        # with self.db_connection.cursor() as cursor:
-            # cursor.execute(insert_query, [fields, values])
-        return False
+        fields_string = ', '.join(fields)
+        insert_query = ' '.join(['INSERT INTO', table_name, '(', fields_string, ') VALUES '])
+        insert_query = self._add_values_to_insert(insert_query, values, datatypes)
+
+        with self.db_connection.cursor() as cursor:
+            cursor.execute(insert_query)
 
     def _row_exists(self, fields, datatypes, row, table_name):
         # TODO complete function
@@ -128,3 +131,24 @@ class QueryManager(object):
         else:
             where_clause = ''.join([field, '=', value, ' OR'])
         return where_clause
+
+    def _add_values_to_insert(self, base_query, values, datatypes):
+        # TODO move datatype variants into fixture
+        text_types = ['Text', 'Varchar', 'Char']
+        date_types = ['Date', 'Datetime']
+
+        insert_query = base_query
+        for row in values:
+            values_string = '('
+            for value, datatype in zip(row, datatypes):
+                # TODO what about date types?
+                if datatype in text_types:
+                    sep = '\''
+                else:
+                    sep = ''
+                values_string = ''.join([values_string, sep, value, sep, ','])
+            values_string = values_string[:-1] + ')'
+            insert_query = ''.join([insert_query, values_string, ','])
+        insert_query = insert_query[:-1] + ';'
+
+        return insert_query
