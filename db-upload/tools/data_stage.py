@@ -52,11 +52,6 @@ class DataStage(object):
         drop_list = ['index', 'datatype', 'data size'] # TODO this should be a fixture
         clean_list = [ row for row in data_list if row[0].lower() not in drop_list ]
 
-        if fields[0].lower()=='index':
-            fields.pop(0)
-            datatypes.pop(0)
-            clean_list = [row[1:] for row in clean_list]
-
         return fields, datatypes, clean_list
 
     def archive_file(self, filename):
@@ -90,6 +85,11 @@ class QueryManager(object):
 
     def make_inserts(self, fields, values, table_name):
         # TODO write query and function
+
+        if fields[0].lower()=='index':
+            fields.pop(0)
+            values = [row[1:] for row in values]
+
         base_query = ' '.join(['INSERT INTO', table_name, '( )'])
         # with self.db_connection.cursor() as cursor:
             # cursor.execute(insert_query, [fields, values])
