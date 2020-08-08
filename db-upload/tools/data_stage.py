@@ -21,7 +21,7 @@ class DataStage(object):
         return 0, 0 # returns list of (query, args) tuples
 
     def _get_CSV_list(self):
-        # Renames CSV files to lower case and return list with new names
+        # Renames CSV files to adequate case and return list with new names
         for file in os.listdir(self.pending_path):
             if file[-4:]=='.csv':
                 os.rename(os.path.join(self.pending_path,file),
@@ -52,6 +52,12 @@ class DataStage(object):
         datatypes = list([row for row in data_list if row[0].lower()=='datatype'][0])
         drop_list = ['index', 'datatype', 'data size'] # TODO this should be a fixture
         clean_list = [ row for row in data_list if row[0].lower() not in drop_list ]
+
+        if fields[0].lower()=='index':
+            fields.pop(0)
+            datatypes.pop(0)
+            clean_list = [row[1:] for row in clean_list]
+
         return fields, datatypes, clean_list
 
     def archive_file(self, filename):
@@ -74,6 +80,7 @@ class QueryManager(object):
 
         for row in values:
             if self._row_exists(fields, datatypes, row, table_name):
+                # TODO does the insert tag ON DUPLICATE KEY solve all of this? Only if having index?
                 # TODO maybe "_row_exists" should return only fields to add?
                 # cursor.execute(query, args)
                 update_values.append(row)
@@ -84,13 +91,15 @@ class QueryManager(object):
 
     def make_inserts(self, fields, values, table_name):
         # TODO write query and function
-        # cursor.execute(insert_query, [fields, values])
+        base_query = ' '.join(['INSERT INTO', table_name, '( )'])
+        # with self.db_connection.cursor() as cursor:
+            # cursor.execute(insert_query, [fields, values])
         return False
 
     def _row_exists(self, fields, datatypes, row, table_name):
         # TODO complete function
 
-        base_query = 'SELECT * FROM Entidades WHERE'
+        base_query = ' '.join(['SELECT * FROM', table_name, 'WHERE'])
         with self.db_connection.cursor() as cursor:
             query = base_query
             for field, datatype, value in zip(fields, datatypes, row):
