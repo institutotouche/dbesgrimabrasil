@@ -158,7 +158,4 @@ class QueryManager(object):
         insert_query = ''.join([insert_query, values_string, ','])
         insert_query = insert_query[:-1] + ';'
 
-        print('*****')
-        print(insert_query)
-        print('*****')
         return insert_query
