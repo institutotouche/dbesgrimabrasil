@@ -90,12 +90,12 @@ class QueryManager(object):
             datatypes.pop(0)
             values = [row[1:] for row in values]
 
-        fields_string = ', '.join(fields)
-        insert_query = ' '.join(['INSERT INTO', table_name, '(', fields_string, ') VALUES '])
-        insert_query = self._add_values_to_insert(insert_query, values, datatypes)
+        base_query = ' '.join(['INSERT INTO', table_name])
 
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(insert_query)
+        for row in values:
+            insert_query = self._add_values_to_insert(base_query, fields, row, datatypes)
+            with self.db_connection.cursor() as cursor:
+                cursor.execute(insert_query)
 
     def _row_exists(self, fields, datatypes, row, table_name):
         # TODO complete function
@@ -131,23 +131,34 @@ class QueryManager(object):
             where_clause = ''.join([field, '=', value, ' OR'])
         return where_clause
 
-    def _add_values_to_insert(self, base_query, values, datatypes):
+    def _add_values_to_insert(self, base_query, fields, values_row, datatypes):
         # TODO move datatype variants into fixture
         text_types = ['Text', 'Varchar', 'Char']
         date_types = ['Date', 'Datetime']
 
-        insert_query = base_query
-        for row in values:
-            values_string = '('
-            for value, datatype in zip(row, datatypes):
-                # TODO what about date types?
-                if datatype in text_types:
-                    sep = '\''
-                else:
-                    sep = ''
-                values_string = ''.join([values_string, sep, value, sep, ','])
-            values_string = values_string[:-1] + ')'
-            insert_query = ''.join([insert_query, values_string, ','])
+        clean_fields = list(fields)
+        clean_values = list(values_row)
+        for field, value in zip(fields, values_row):
+            if (value == '\'\'') or (not value):
+                clean_fields.remove(field)
+                clean_values.remove(value)
+
+        fields_string = ','.join(clean_fields)
+        insert_query = ''.join([base_query,' (',fields_string, ') '])
+
+        values_string = 'VALUES ('
+        for value, datatype in zip(clean_values, datatypes):
+            # TODO what about date types?
+            if datatype in text_types:
+                sep = '\''
+            else:
+                sep = ''
+            values_string = ''.join([values_string, sep, value, sep, ','])
+        values_string = values_string[:-1] + ')'
+        insert_query = ''.join([insert_query, values_string, ','])
         insert_query = insert_query[:-1] + ';'
 
+        print('*****')
+        print(insert_query)
+        print('*****')
         return insert_query
