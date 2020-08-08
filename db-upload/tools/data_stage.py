@@ -3,26 +3,18 @@ import os
 
 class DataStage(object):
     def __init__(self, db_connection, pending_dir='upload-pending'):
-        self.db_connection = db_connection
         self.pending_path = os.path.join('.',pending_dir)
         csv_list = self._get_CSV_list()
         self.sorted_csv_list = self._prioritize(csv_list)
-        # TODO move base queries to a json fixture
-        self.base_queries={
-            # 'select_all': 'SELECT * FROM %(table)s',
-            'select_all': 'SELECT * FROM Entidades WHERE LOWER(Nome) LIKE \'%s\' ',
-            'insert': '',
-            'update': ''
-        }
+        self.query_manager = QueryManager(db_connection)
 
     def process_file(self, file_name):
         table_name = file_name[:-4]
         raw_data_list = self._read_data(os.path.join(self.pending_path, file_name))
         fields, datatypes, values = self._clean_headers(raw_data_list)
 
-        update_values, insert_values = self._make_updates(fields, datatypes, values, table_name)
-        # TODO make inserts
-        # cursor.execute(insert_query, [fields, insert_values])
+        update_values, insert_values = self.query_manager.make_updates(fields, datatypes, values, table_name)
+        self.query_manager.make_inserts(fields, insert_values, table_name)
 
         # TODO think about meaningful return
         return 0, 0 # returns list of (query, args) tuples
@@ -61,7 +53,14 @@ class DataStage(object):
         clean_list = [ row for row in data_list if row[0].lower() not in drop_list ]
         return fields, datatypes, clean_list
 
-    def _make_updates(self, fields, datatypes, values, table_name):
+
+class QueryManager(object):
+
+    def __init__(self, db_connection):
+        self.db_connection = db_connection
+        # TODO read base queries from fixture (?)
+
+    def make_updates(self, fields, datatypes, values, table_name):
         update_values = []
         insert_values = []
 
@@ -71,9 +70,13 @@ class DataStage(object):
                 update_values.append(row)
             else:
                 insert_values.append(row)
-        # else, add to insert list
 
         return update_values, insert_values
+
+    def make_inserts(self, fields, values, table_name):
+        # TODO write query and function
+        # cursor.execute(insert_query, [fields, values])
+        return False
 
     def _row_exists(self, fields, datatypes, row, table_name):
         # TODO complete function
