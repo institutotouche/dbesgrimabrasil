@@ -1,0 +1,19 @@
+{
+  "StatusCombates": ["Status"],
+  "FontesInformacao": ["Fonte"],
+  "Individuos": ["NumeroCBE", "Nome"],
+  "AlteracoesNomesIndividuos": [],
+  "Entidades": ["RegistroCBE", "Nome", "Endereco"],
+  "AlteracoesNomesEntidades": [],
+  "PeriodosEPDs": [("IndexEPD", "Inicio"), ("IndexEPD", "Fim"),],
+  "Arbitros": ["IndexIndividuo"],
+  "FiliacaoTecnicos": [],
+  "Eventos": [("Nome", "Data")],
+  "Provas": [("IndexEvento", "Arma", "CategoriaIdade", "CategoriaCadeiraDeRodas", "Sexo", "EquipeOuIndividual")],
+  "Delegacoes": [],
+  "Equipes": [],
+  "CombatesIndividuais": [("IndexProva", "Rodada", "IndexAtleta1", "IndexAtleta2")],
+  "CombatesEquipes": [("IndexProva", "Rodada", "Parcial", "IndexEquipe1", "IndexEquipe2")],
+  "Resultados": [("IndexProva", "IndexAtleta"), ("IndexProva", "IndexEquipe")],
+  "Ranking": [("DataPublicacao", "IndexAtleta", "Arma", "CategoriaIdade", "CategoriaCadeiraDeRodas", "Sexo")]
+}
