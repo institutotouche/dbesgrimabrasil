@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS AlteracoesNomesIndividuos (					-- Cada registro uma 
 	IndexIndividuo BIGINT NOT NULL,						-- Referencia ao individuo
 	DataAlteracao DATE,									-- Data da alteracao
 	NomeAnterior VARCHAR(255),							-- Nome do individuo antes da alteracao
-	NomeFinal VARCHAR,									-- Nome do individuo apos a alteracao (caso seja a ultima alteracao, deve corresponder ao nome na tabela Individuos)
+	NomeFinal VARCHAR(255),									-- Nome do individuo apos a alteracao (caso seja a ultima alteracao, deve corresponder ao nome na tabela Individuos)
 	IndexFonte BIGINT,									-- Indice de referencia da ultima fonte de informacao
 	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	-- Momento da ultima atualizacao
 )
