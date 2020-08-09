@@ -1,5 +1,6 @@
 import csv, json
 import os
+from tqdm import tqdm
 
 class DataStage(object):
     def __init__(self, db_connection, pending_dir='upload-pending', archive_dir='upload-completed'):
@@ -11,6 +12,7 @@ class DataStage(object):
 
     def process_file(self, file_name):
         table_name = file_name[:-4]
+        print('Inserindo dados na tabela', table_name)
         raw_data_list = self._read_data(os.path.join(self.pending_path, file_name))
         fields, datatypes, values = self._clean_headers(raw_data_list)
 
@@ -92,7 +94,8 @@ class QueryManager(object):
 
         base_query = ' '.join(['INSERT INTO', table_name])
 
-        for row in values:
+        print('Inserindo linhas novas')
+        for row in tqdm(values):
             insert_query = self._add_values_to_insert(base_query, fields, row, datatypes)
             with self.db_connection.cursor() as cursor:
                 cursor.execute(insert_query)
