@@ -4,42 +4,27 @@ import pymysql
 
 import sys
 sys.path.insert(1, os.path.join('..','credentials'))
-from google_proxy import GoogleProxy
+from google_mysql_connection import GoogleMySQLConnection
 
 from tools.data_stage import DataStage
 
 # Load credentials
 credentials_path = os.path.join('..','credentials','connect_credentials.json')
-with open(credentials_path) as f:
-    credentials = json.load(f)
 
-# Start proxy
-proxy = GoogleProxy(credentials)
-proxy.open()
-
-# Instantiate connection
-connection = pymysql.connect(host=credentials.get('host','localhost'),
-                             port=credentials.get('port',3306),
-                             user=credentials.get('user','user'),
-                             password=credentials.get('password','password'),
-                             db=credentials.get('db','db'))
+# Open connection
+db_connection = GoogleMySQLConnection(credentials_path)
 
 # Read data from CSVs
-stage = DataStage(connection)
+stage = DataStage(db_connection.connection)
 if stage.sorted_csv_list:
     for file in stage.sorted_csv_list:
         stage.process_file(file)
         stage.archive_file(file)
-    connection.commit()
+    db_connection.connection.commit()
 else:
     print('\nNenhum arquivo encontrado para upload\n')
 
 # Finalize connection
-while connection.open:
-    connection.close()
-print('Conexão com o banco de dados finalizada.')
-
-# close proxy
-proxy.close()
+db_connection.finish()
 
 print('\n\n***** Script terminado sem erros *****\n\n')

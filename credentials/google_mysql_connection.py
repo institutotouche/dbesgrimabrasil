@@ -1,5 +1,36 @@
 import os, subprocess
 import time
+import json
+import pymysql
+
+class GoogleMySQLConnection(object):
+
+    def __init__(self, credentials_path):
+        with open(credentials_path) as f:
+            credentials = json.load(f)
+
+        # Start proxy
+        self.proxy = GoogleProxy(credentials)
+        self.proxy.open()
+
+        # Instantiate connection
+        self.connection = pymysql.connect(host=credentials.get('host','localhost'),
+                                     port=credentials.get('port',3306),
+                                     user=credentials.get('user','user'),
+                                     password=credentials.get('password','password'),
+                                     db=credentials.get('db','db'))
+
+    def finish(self):
+
+        # Finalize connection
+        while self.connection.open:
+            self.connection.close()
+        print('Conexão com o banco de dados finalizada.')
+
+        # close proxy
+        self.proxy.close()
+
+
 
 class GoogleProxy(object):
 
