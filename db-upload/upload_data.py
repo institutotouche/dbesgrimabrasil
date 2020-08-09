@@ -2,7 +2,10 @@ import json
 import os
 import pymysql
 
-from tools.google_proxy import GoogleProxy
+import sys
+sys.path.insert(1, os.path.join('..','credentials'))
+from google_proxy import GoogleProxy
+
 from tools.data_stage import DataStage
 
 # Load credentials
