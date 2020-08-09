@@ -137,16 +137,18 @@ class QueryManager(object):
         date_types = ['Date', 'Datetime']
 
         clean_fields = list(fields)
+        clean_types = list(datatypes)
         clean_values = list(values_row)
-        for field, value in zip(fields, values_row):
+        for field, datatype, value in zip(fields, datatypes, values_row):
             if (value == '\'\'') or (not value):
                 clean_fields.remove(field)
+                clean_types.remove(datatype)
                 clean_values.remove(value)
 
         fields_string = ','.join(clean_fields)
         insert_query = ''.join([base_query, ' (', fields_string, ') VALUES ('])
 
-        for value, datatype in zip(clean_values, datatypes):
+        for value, datatype in zip(clean_values, clean_types):
             # TODO what about date types?
             if datatype in text_types:
                 sep = '\''
