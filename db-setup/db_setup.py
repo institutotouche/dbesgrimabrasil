@@ -32,7 +32,9 @@ def process_queries(query_key, queries_path, connection):
                     if file[:6].lower()==query_key]
 
     for file_path in query_list:
+        print('Processando arquivo', file_path)
         query = read_query(file_path)
+        print('Query:\n', query, '\n')
         with connection.cursor() as cursor:
             cursor.execute(query)
 
@@ -41,7 +43,7 @@ def process_queries(query_key, queries_path, connection):
 
 def read_query(file_path):
     with open(file_path, 'r') as f:
-        query = f.read().replace('\n',' ')
+        query = f.read()
     return query
 
 
