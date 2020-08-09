@@ -139,19 +139,13 @@ class QueryManager(object):
         text_types = ['Text', 'Varchar', 'Char']
         date_types = ['Date', 'Datetime']
 
-        clean_fields = list(fields)
-        clean_types = list(datatypes)
-        clean_values = list(values_row)
-        for field, datatype, value in zip(fields, datatypes, values_row):
-            if (value == '\'\'') or (not value):
-                clean_fields.remove(field)
-                clean_types.remove(datatype)
-                clean_values.remove(value)
+        clean_fields, clean_types, clean_values = self._remove_empty_values(fields, datatypes, values_row)
 
         fields_string = ','.join(clean_fields)
         insert_query = ''.join([base_query, ' (', fields_string, ') VALUES ('])
 
         for value, datatype in zip(clean_values, clean_types):
+            print('value', value, 'is type', datatype)
             # TODO must check for date format
             if (datatype in text_types) or (datatype in date_types):
                 sep = '\''
@@ -161,3 +155,27 @@ class QueryManager(object):
         insert_query = insert_query[:-1] + ');'
 
         return insert_query
+
+    def _remove_empty_values(self, fields, datatypes, values):
+        empty_values = ['\'\'', '']
+
+        clean_fields = list(fields)
+        clean_types = list(datatypes)
+        clean_values = list(values)
+
+        # mark for removal
+        for i, (field, datatype, value) in enumerate(zip(fields, datatypes, values)):
+            if value in empty_values:
+                clean_fields[i] = 'remove_this_field'
+                clean_types[i] = 'remove_this_field'
+                clean_values[i] = 'remove_this_field'
+
+        # actually remove
+        while 'remove_this_field' in clean_fields:
+            clean_fields.remove('remove_this_field')
+        while 'remove_this_field' in clean_types:
+            clean_types.remove('remove_this_field')
+        while 'remove_this_field' in clean_values:
+            clean_values.remove('remove_this_field')
+
+        return clean_fields, clean_types, clean_values
