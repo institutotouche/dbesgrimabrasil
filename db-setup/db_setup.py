@@ -4,20 +4,46 @@ import pymysql
 
 import sys
 sys.path.insert(1, os.path.join('..','credentials'))
-from google_proxy import GoogleProxy
+from google_mysql_connection import GoogleMySQLConnection
 
-# Load credentials
-credentials_path = os.path.join('..','credentials','connect_credentials.json')
-with open(credentials_path) as f:
-    credentials = json.load(f)
 
-# Start proxy
-proxy = GoogleProxy(credentials)
-proxy.open()
+def main():
 
-# Instantiate connection
-connection = pymysql.connect(host=credentials.get('host','localhost'),
-                             port=credentials.get('port',3306),
-                             user=credentials.get('user','user'),
-                             password=credentials.get('password','password'),
-                             db=credentials.get('db','db'))
+    # Load paths
+    credentials_path = os.path.join('..','credentials','connect_credentials.json')
+    queries_path = os.path.join('.', 'queries')
+
+    # Open connection
+    db_connection = GoogleMySQLConnection(credentials_path)
+
+    process_queries('create', queries_path, db_connection.connection)
+    process_queries('insert', queries_path, db_connection.connection)
+
+    # Finalize connection
+    db_connection.finish()
+
+    print('\n\n***** Script terminado sem erros *****\n\n')
+
+
+def process_queries(query_key, queries_path, connection):
+
+    query_list = [os.path.join(queries_path, file)
+                    for file in os.listdir(queries_path)
+                    if file[:6].lower()==query_key]
+
+    for file_path in query_list:
+        query = read_query(file_path)
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+
+    connection.commit()
+
+
+def read_query(file_path):
+    with open(file_path, 'r') as f:
+        query = f.read().replace('\n',' ')
+    return query
+
+
+if __name__ == '__main__':
+    main()
