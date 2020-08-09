@@ -101,18 +101,18 @@ class QueryManager(object):
         # TODO complete function
 
         base_query = ' '.join(['SELECT * FROM', table_name, 'WHERE'])
-        with self.db_connection.cursor() as cursor:
-            query = base_query
-            for field, datatype, value in zip(fields, datatypes, row):
-                if field.lower() == 'index':
-                    continue
-                elif value:
-                    new_clause = self._add_field_to_where_clause(field, value, datatype)
-                    query = ' '.join([query, new_clause])
-            if query[-3:] == ' OR':
-                query = query[:-3]
-            cursor.execute(query)
-            results = cursor.fetchall()
+        # with self.db_connection.cursor() as cursor:
+        #     query = base_query
+        #     for field, datatype, value in zip(fields, datatypes, row):
+        #         if field.lower() == 'index':
+        #             continue
+        #         elif value:
+        #             new_clause = self._add_field_to_where_clause(field, value, datatype)
+        #             query = ' '.join([query, new_clause])
+        #     if query[-3:] == ' OR':
+        #         query = query[:-3]
+        #     cursor.execute(query)
+        #     results = cursor.fetchall()
         # TODO assess results (is it enough that one value was found?)
         # TODO rules may be different for each table... so a new fixture?
         return False
