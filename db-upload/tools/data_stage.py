@@ -150,7 +150,7 @@ class QueryManager(object):
 
         for value, datatype in zip(clean_values, clean_types):
             # TODO what about date types?
-            if datatype in text_types:
+            if (datatype in text_types) or (datatype in date_types):
                 sep = '\''
             else:
                 sep = ''
