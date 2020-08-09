@@ -145,7 +145,6 @@ class QueryManager(object):
         insert_query = ''.join([base_query, ' (', fields_string, ') VALUES ('])
 
         for value, datatype in zip(clean_values, clean_types):
-            print('value', value, 'is type', datatype)
             # TODO must check for date format
             if (datatype in text_types) or (datatype in date_types):
                 sep = '\''
