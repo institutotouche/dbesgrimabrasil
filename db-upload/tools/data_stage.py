@@ -157,7 +157,7 @@ class QueryManager(object):
                 sep = '\''
             else:
                 sep = ''
-            insert_query = ''.join([insert_query, sep, value, sep, ','])
+            insert_query = ''.join([insert_query, sep, value.replace('\'','\\\'').replace('\"','\\\"'), sep, ','])
         insert_query = insert_query[:-1] + ');'
 
         return insert_query
